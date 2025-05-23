@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload Bank Statement</title>
+</head>
+<body style="font-family: sans-serif; padding: 20px;">
+  <h2>Upload PDF Bank Statement</h2>
+  <form id="uploadForm">
+    <input type="file" name="pdf" accept="application/pdf" required />
+    <br/><br/>
+    <button type="submit">Upload</button>
+  </form>
+
+  <p id="response"></p>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const responseText = document.getElementById('response');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = form.querySelector('input[type="file"]');
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('pdf', file);
+
+      responseText.textContent = "Uploading...";
+
+      try {
+        const res = await fetch('https://bank-api-41hv.onrender.com/parse', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await res.json();
+        responseText.textContent = "Success! Parsed transactions: " + JSON.stringify(result.transactions || result);
+      } catch (err) {
+        console.error(err);
+        responseText.textContent = "Error uploading the PDF.";
+      }
+    });
+  </script>
+</body>
+</html>
